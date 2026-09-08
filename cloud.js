@@ -1,9 +1,13 @@
 (() => {
+  const SUPABASE_URL = "https://ojsdrzpydcxdvyfqbhim.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_DBBwIUzqtlrM1kD7qnlYrQ_OtmnLPGu";
+
   let client = null;
   let user = null;
   let ready = false;
   let activeUserId = null;
   let queue = Promise.resolve();
+  let authStarted = false;
 
   function status(state, text) {
     window.dispatchEvent(new CustomEvent("seimos-cloud-status", { detail: { state, text } }));
@@ -66,9 +70,9 @@
     if (error) throw error;
   }
 
-  async function syncForUser(nextClient, nextUser) {
+  async function syncForUser(nextClient, nextUser, force = false) {
     if (!nextClient || !nextUser) return;
-    if (ready && activeUserId === nextUser.id) return;
+    if (!force && ready && activeUserId === nextUser.id) return;
 
     client = nextClient;
     user = nextUser;
@@ -133,7 +137,6 @@
     ready = false;
     activeUserId = null;
     user = null;
-    client = null;
     transactions = [];
     await persistTransactionsToDb();
     render();
@@ -143,31 +146,46 @@
   const originalSave = save;
   save = function () {
     originalSave();
-    if (ready) {
-      queue = queue.then(upsertCurrent).catch(() => {});
-    }
+    if (ready) queue = queue.then(upsertCurrent).catch(() => {});
   };
 
   const originalDoDelete = doDelete;
   doDelete = function () {
     const id = deleteId;
     originalDoDelete();
-    if (ready && id) {
-      queue = queue.then(() => deleteCloudTransaction(id)).catch(() => {});
-    }
+    if (ready && id) queue = queue.then(() => deleteCloudTransaction(id)).catch(() => {});
   };
 
-  window.addEventListener("seimos-auth-change", event => {
-    const detail = event.detail || {};
-    if (detail.event === "SIGNED_OUT") {
-      clearLocalAfterSignOut();
+  function startCloudAuth() {
+    if (authStarted) return;
+    if (!window.supabase?.createClient) {
+      setTimeout(startCloudAuth, 150);
       return;
     }
-    if (detail.user && detail.client) syncForUser(detail.client, detail.user);
-  });
+    authStarted = true;
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    client.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        clearLocalAfterSignOut();
+        return;
+      }
+      if (session?.user) syncForUser(client, session.user);
+    });
+
+    client.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        status("error", "Nepavyko patikrinti debesies prisijungimo.");
+        return;
+      }
+      if (data?.session?.user) syncForUser(client, data.session.user);
+    });
+  }
 
   window.SeimosCloud = {
-    syncNow: () => client && user ? syncForUser(client, user) : Promise.resolve(),
+    syncNow: () => client && user ? syncForUser(client, user, true) : Promise.resolve(),
     isReady: () => ready
   };
+
+  startCloudAuth();
 })();
