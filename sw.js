@@ -1,4 +1,4 @@
-const CACHE_NAME = "seimos-pinigai-v8-auth";
+const CACHE_NAME = "seimos-pinigai-v9-cloud";
 const CORE = [
   "./",
   "./index.html",
@@ -9,6 +9,7 @@ const CORE = [
   "./app-3.js",
   "./app-4.js",
   "./auth.js",
+  "./cloud.js",
   "./manifest.webmanifest",
   "./icons/icon.svg"
 ];
