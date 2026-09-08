@@ -99,4 +99,28 @@ document.querySelectorAll(".child-card[data-child]").forEach(btn=>{
 });
 $("closeChildDetailsBtn").addEventListener("click",()=>$("childDetailsDialog").close());
 
+function loadAccountModule(){
+  if(document.querySelector('link[href="auth.css"]'))return;
+  const style=document.createElement("link");
+  style.rel="stylesheet";
+  style.href="auth.css";
+  document.head.appendChild(style);
+
+  const supa=document.createElement("script");
+  supa.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+  supa.onload=()=>{
+    const auth=document.createElement("script");
+    auth.src="auth.js";
+    document.body.appendChild(auth)
+  };
+  supa.onerror=()=>{
+    const note=document.createElement("div");
+    note.style.cssText="position:fixed;inset:0;z-index:9999;background:#fff;padding:30px;font-family:system-ui;color:#18304f";
+    note.textContent="Prisijungimo modulis neužsikrovė. Patikrink interneto ryšį ir atidaryk programėlę iš naujo.";
+    document.body.appendChild(note)
+  };
+  document.head.appendChild(supa)
+}
+
 initApp();
+loadAccountModule();
