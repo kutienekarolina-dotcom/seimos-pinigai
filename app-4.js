@@ -74,7 +74,7 @@ $("selectAllBankBtn").addEventListener("click",()=>{
 $("deselectAllBankBtn").addEventListener("click",()=>{
   bankPreviewRows.forEach(r=>r.selected=false);renderBankPreview()
 });
-$("confirmBankImportBtn").addEventListener("click",confirmBankImport);
+$("confirmBankImportBtn").addEventListener("click",()=>confirmBankImport());
 
 $("bankPdfInput").addEventListener("change",e=>{
   const f=e.target.files?.[0];
@@ -87,7 +87,7 @@ $("selectAllPdfBtn").addEventListener("click",()=>{
 $("deselectAllPdfBtn").addEventListener("click",()=>{
   pdfPreviewRows.forEach(r=>r.selected=false);renderPdfPreview()
 });
-$("confirmPdfImportBtn").addEventListener("click",confirmPdfImport);
+$("confirmPdfImportBtn").addEventListener("click",()=>confirmPdfImport());
 
 $("openReportBtn").addEventListener("click",openMonthlyReport);
 $("closeReportBtn").addEventListener("click",()=>$("reportDialog").close());
@@ -110,9 +110,17 @@ function loadAccountModule(){
   cloud.src="cloud.js";
   document.body.appendChild(cloud);
 
+  const imports=document.createElement("script");
+  imports.src="imports.js";
+  document.body.appendChild(imports);
+
   const supa=document.createElement("script");
   supa.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   supa.onload=()=>{
+    const bridge=document.createElement("script");
+    bridge.src="auth-cloud-bridge.js";
+    document.body.appendChild(bridge);
+
     const auth=document.createElement("script");
     auth.src="auth.js";
     document.body.appendChild(auth)
