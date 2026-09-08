@@ -8,8 +8,7 @@ const CORE = [
   "./app-3.js",
   "./app-4.js",
   "./manifest.webmanifest",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon.svg"
 ];
 
 self.addEventListener("install", event => {
