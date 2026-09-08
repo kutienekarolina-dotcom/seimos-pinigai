@@ -106,6 +106,10 @@ function loadAccountModule(){
   style.href="auth.css";
   document.head.appendChild(style);
 
+  const cloud=document.createElement("script");
+  cloud.src="cloud.js";
+  document.body.appendChild(cloud);
+
   const supa=document.createElement("script");
   supa.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   supa.onload=()=>{
