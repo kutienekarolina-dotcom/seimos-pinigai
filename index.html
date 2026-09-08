@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Šeimos pinigai</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="brand-icon brand-logo"><img src="icons/icon-192.png" alt="Šeimos pinigai"></div>
+        <div>
+          <h1>Šeimos pinigai</h1>
+          <div class="tagline">Daugiau aiškumo, mažiau rūpesčių</div>
+        </div>
+      </div>
+      <div class="avatar">K</div>
+    </div>
+
+    <div class="month-row">
+      <label class="month-picker">📅 <input id="monthInput" type="month"></label>
+      <div class="month-nav">
+        <button id="prevMonth" class="icon-btn" type="button">‹</button>
+        <button id="nextMonth" class="icon-btn" type="button">›</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary-grid">
+      <div class="summary-card income">
+        <div class="label">↗ Pajamos</div>
+        <strong id="incomeTotal">0,00 €</strong>
+        <small>Šį mėnesį</small>
+      </div>
+      <div class="summary-card expense">
+        <div class="label">↘ Išlaidos</div>
+        <strong id="expenseTotal">0,00 €</strong>
+        <small>Šį mėnesį</small>
+      </div>
+      <div class="summary-card balance">
+        <div class="label">▣ Likutis</div>
+        <strong id="balanceTotal">0,00 €</strong>
+        <small id="balanceText">Stebime balansą</small>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button id="addExpenseBtn" class="btn-primary" type="button">＋ Išlaida</button>
+      <button id="addIncomeBtn" class="btn-secondary" type="button">＋ Pajamos</button>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="overview" type="button">▥ Suvestinė</button>
+      <button class="tab" data-tab="transactions" type="button">☷ Įrašai</button>
+      <button class="tab" data-tab="data" type="button">◔ Duomenys</button>
+    </nav>
+
+    <section id="overviewTab">
+      <div class="panel">
+        <div class="section-head">
+          <h2>Išlaidos pagal kategorijas</h2>
+          <button class="link-btn" data-go="transactions" type="button">Žiūrėti visas ›</button>
+        </div>
+        <div id="categoryList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <h2>Kas mokėjo</h2>
+          <span class="tagline">Per šį mėnesį</span>
+        </div>
+        <div class="payer-grid">
+          <div class="payer-card">
+            <div class="who">Aš</div>
+            <strong id="payerMe">0,00 €</strong>
+            <div class="mini-progress"><span id="payerMeBar" style="width:0%"></span></div>
+          </div>
+          <div class="payer-card">
+            <div class="who">Vyras</div>
+            <strong id="payerHusband">0,00 €</strong>
+            <div class="mini-progress"><span id="payerHusbandBar" style="width:0%"></span></div>
+          </div>
+          <div class="payer-card">
+            <div class="who">Bendri pinigai</div>
+            <strong id="payerJoint">0,00 €</strong>
+            <div class="mini-progress"><span id="payerJointBar" style="width:0%"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <h2>Mano, vyro ir vaikų poreikiai</h2>
+          <span class="tagline">Atskira kontrolė</span>
+        </div>
+
+        <div class="needs-grid">
+          <div class="need-card">
+            <div class="need-title">Mano poreikiai</div>
+            <strong id="myNeeds">0,00 €</strong>
+          </div>
+          <div class="need-card">
+            <div class="need-title">Vyro poreikiai</div>
+            <strong id="hisNeeds">0,00 €</strong>
+          </div>
+        </div>
+
+        <div class="children-total-row">
+          <span>Vaikų poreikiai iš viso</span>
+          <strong id="childrenNeeds">0,00 €</strong>
+        </div>
+
+        <div class="children-list">
+          <button class="child-card" type="button" data-child="Rajanas">
+            <span class="child-name">Rajanas</span>
+            <strong class="child-total" id="childRajanasTotal">0,00 €</strong>
+            <span class="child-hint">Peržiūrėti ›</span>
+          </button>
+          <button class="child-card" type="button" data-child="Rusnė">
+            <span class="child-name">Rusnė</span>
+            <strong class="child-total" id="childRusneTotal">0,00 €</strong>
+            <span class="child-hint">Peržiūrėti ›</span>
+          </button>
+          <button class="child-card" type="button" data-child="Reina">
+            <span class="child-name">Reina</span>
+            <strong class="child-total" id="childReinaTotal">0,00 €</strong>
+            <span class="child-hint">Peržiūrėti ›</span>
+          </button>
+          <button class="child-card" type="button" data-child="Žemyna">
+            <span class="child-name">Žemyna</span>
+            <strong class="child-total" id="childZemynaTotal">0,00 €</strong>
+            <span class="child-hint">Peržiūrėti ›</span>
+          </button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="section-head">
+          <h2>Paskutiniai įrašai</h2>
+          <button class="link-btn" data-go="transactions" type="button">Žiūrėti visus ›</button>
+        </div>
+        <div id="recentList"></div>
+      </div>
+    </section>
+
+    <section id="transactionsTab" class="hidden">
+      <div class="panel">
+        <div class="section-head"><h2>Visi įrašai</h2></div>
+        <div class="filters">
+          <input id="searchInput" type="search" placeholder="Ieškoti...">
+          <select id="filterCategory"><option value="">Visos kategorijos</option></select>
+          <select id="filterType">
+            <option value="">Visi tipai</option>
+            <option value="expense">Išlaidos</option>
+            <option value="income">Pajamos</option>
+          </select>
+          <select id="filterChild">
+            <option value="">Visi vaikai</option>
+            <option value="Rajanas">Rajanas</option>
+            <option value="Rusnė">Rusnė</option>
+            <option value="Reina">Reina</option>
+            <option value="Žemyna">Žemyna</option>
+          </select>
+        </div>
+        <div id="transactionList"></div>
+      </div>
+    </section>
+
+    <section id="dataTab" class="hidden">
+      <div class="panel">
+        <div class="section-head"><h2>Duomenys ir ataskaitos</h2></div>
+
+        <div class="data-card">
+          <strong>🏦 Banko CSV importas</strong>
+          <p>Įkelk iš banko atsisiųstą CSV. Pirmiausia parodysiu operacijas patikrinimui ir pasiūlysiu kategorijas.</p>
+          <label class="file-label">Pasirinkti banko CSV<input id="bankCsvInput" type="file" accept=".csv,text/csv"></label>
+          <div id="bankImportStatus" class="tagline" style="margin-top:8px"></div>
+
+          <div id="bankImportBox" class="bank-import-box hidden">
+            <h3>1. Patikrink stulpelius</h3>
+            <p class="tagline">Jei sistema atpažino neteisingai, pasirink tinkamus stulpelius.</p>
+            <div class="mapping-grid">
+              <label>Data<select id="mapDate"></select></label>
+              <label>Aprašymas / gavėjas<select id="mapDescription"></select></label>
+              <label>Suma<select id="mapAmount"></select></label>
+              <label>Išlaidų suma (jei atskiras stulpelis)<select id="mapDebit"></select></label>
+              <label>Pajamų suma (jei atskiras stulpelis)<select id="mapCredit"></select></label>
+            </div>
+
+            <div class="import-actions">
+              <button id="refreshBankPreviewBtn" class="import-ghost" type="button">Atnaujinti peržiūrą</button>
+            </div>
+
+            <div class="import-summary">
+              <span>Rasta operacijų</span>
+              <strong id="bankPreviewCount">0</strong>
+            </div>
+
+            <h3 style="margin-top:14px">2. Patikrink operacijas</h3>
+            <div id="bankPreview" class="import-preview"></div>
+
+            <div class="import-actions">
+              <button id="selectAllBankBtn" class="import-ghost" type="button">Pažymėti visas</button>
+              <button id="deselectAllBankBtn" class="import-ghost" type="button">Nuimti visas</button>
+              <button id="confirmBankImportBtn" class="import-primary" type="button">Importuoti pažymėtas</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-card">
+          <strong>📄 Banko PDF importas</strong>
+          <p>Įkelk banko sugeneruotą tekstinį PDF išrašą. Sistema ištrauks tekstą, bandys rasti operacijas ir leis jas patikrinti prieš importuojant.</p>
+          <label class="file-label">Pasirinkti banko PDF<input id="bankPdfInput" type="file" accept=".pdf,application/pdf"></label>
+          <div id="bankPdfStatus" class="tagline" style="margin-top:8px"></div>
+          <div class="pdf-note">PDF nuskaitymui šioje testinėje versijoje reikia interneto, nes naudojama PDF skaitymo biblioteka. Nuskenuoti / fotografuoti PDF be tekstinio sluoksnio dar nebus atpažįstami.</div>
+
+          <div id="bankPdfBox" class="bank-import-box hidden">
+            <div class="import-summary">
+              <span>Rasta galimų operacijų</span>
+              <strong id="bankPdfCount">0</strong>
+            </div>
+            <div id="bankPdfPreview" class="import-preview"></div>
+            <div class="import-actions">
+              <button id="selectAllPdfBtn" class="import-ghost" type="button">Pažymėti visas</button>
+              <button id="deselectAllPdfBtn" class="import-ghost" type="button">Nuimti visas</button>
+              <button id="confirmPdfImportBtn" class="import-primary" type="button">Importuoti pažymėtas</button>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="data-card">
+          <strong>📲 Įdiegti programėlę</strong>
+          <p>Įdiegus „Šeimos pinigai“ atsiras telefono pagrindiniame ekrane ir atsidarys kaip atskira programėlė.</p>
+          <button id="installAppBtn" type="button" disabled>Įdiegimas bus galimas atidarius per HTTPS</button>
+          <div id="installStatus" class="tagline" style="margin-top:8px"></div>
+        </div>
+
+        <div class="data-card">
+          <strong>CSV atsarginė kopija</strong>
+          <p>Išsaugok visus įrašus CSV formatu.</p>
+          <button id="exportCsvBtn" type="button">Eksportuoti CSV</button>
+        </div>
+
+        <div class="data-card">
+          <strong>Atkurti iš CSV</strong>
+          <p>Importuok šios programėlės anksčiau eksportuotą CSV.</p>
+          <label class="file-label">Pasirinkti CSV<input id="importCsvInput" type="file" accept=".csv,text/csv"></label>
+          <div id="importMessage" class="tagline" style="margin-top:8px"></div>
+        </div>
+
+        <div class="data-card">
+          <strong>📊 Mėnesio ataskaita</strong>
+          <p>Paruošk pilną pasirinkto mėnesio ataskaitą: pajamas, išlaidas, kategorijas, kas mokėjo, poreikius, vaikus ir visas operacijas.</p>
+          <button id="openReportBtn" type="button">Atidaryti ataskaitą</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="bottom-nav">
+  <button class="bottom-item active" data-go="overview"><b>⌂</b>Pradžia</button>
+  <button class="bottom-item" data-go="transactions"><b>▥</b>Biudžetas</button>
+  <button class="bottom-item" data-go="overview"><b>◉</b>Tikslai</button>
+  <button class="bottom-item" data-go="data"><b>•••</b>Daugiau</button>
+</nav>
+
+<dialog id="entryDialog">
+  <form id="entryForm" class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="tagline" id="modalKicker">NAUJA IŠLAIDA</div>
+        <h2 id="modalTitle">Pridėti išlaidą</h2>
+      </div>
+      <button id="closeDialogBtn" class="close-btn" type="button">×</button>
+    </div>
+
+    <input id="entryId" type="hidden">
+    <input id="entryType" type="hidden" value="expense">
+
+    <label class="field"><span>Suma €</span><input id="amountInput" type="number" min="0.01" step="0.01" inputmode="decimal" required></label>
+    <label class="field"><span>Data</span><input id="dateInput" type="date" required></label>
+    <label class="field"><span id="nameLabel">Kur išleista / ką pirkau</span><input id="nameInput" type="text" required placeholder="Pvz. Maxima, pratybos, kuras"></label>
+    <label class="field"><span>Kategorija</span><select id="categoryInput" required></select></label>
+    <label id="childField" class="field hidden"><span>Kuriam vaikui?</span>
+      <select id="childInput">
+        <option value="Rajanas">Rajanas</option>
+        <option value="Rusnė">Rusnė</option>
+        <option value="Reina">Reina</option>
+        <option value="Žemyna">Žemyna</option>
+      </select>
+    </label>
+    <label id="payerField" class="field"><span>Kas sumokėjo?</span>
+      <select id="payerInput"><option>Aš</option><option>Vyras</option><option>Bendri pinigai</option></select>
+    </label>
+    <label class="field"><span>Pastaba (nebūtina)</span><textarea id="noteInput" rows="2"></textarea></label>
+
+    <div id="formError" class="status"></div>
+    <div class="modal-actions">
+      <button id="cancelBtn" class="cancel" type="button">Atšaukti</button>
+      <button class="save" type="submit">Išsaugoti</button>
+    </div>
+  </form>
+</dialog>
+
+
+
+<dialog id="reportDialog">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="tagline">MĖNESIO ATASKAITA</div>
+        <h2>Šeimos finansų ataskaita</h2>
+      </div>
+      <button id="closeReportBtn" class="close-btn" type="button">×</button>
+    </div>
+    <div id="reportPreview" class="report-preview"></div>
+    <div class="report-actions">
+      <button id="reportPrintBtn" class="primary" type="button">Išsaugoti kaip PDF</button>
+      <button id="reportCloseBtn" type="button">Uždaryti</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="printReport" aria-hidden="true">
+  <div class="print-page">
+    <div id="printReportContent" class="report-preview"></div>
+  </div>
+</div>
+
+<dialog id="childDetailsDialog">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="tagline">VAIKO POREIKIAI</div>
+        <h2 id="childDetailsTitle">Vaiko poreikiai</h2>
+      </div>
+      <button id="closeChildDetailsBtn" class="close-btn" type="button">×</button>
+    </div>
+
+    <div class="detail-summary">
+      <div class="payer-card">
+        <div class="who">Aš</div>
+        <strong id="detailPaidMe">0,00 €</strong>
+      </div>
+      <div class="payer-card">
+        <div class="who">Vyras</div>
+        <strong id="detailPaidHusband">0,00 €</strong>
+      </div>
+      <div class="payer-card">
+        <div class="who">Bendri</div>
+        <strong id="detailPaidJoint">0,00 €</strong>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Išlaidos</h2>
+      <strong id="detailChildTotal">0,00 €</strong>
+    </div>
+    <div id="childDetailsList" class="detail-list"></div>
+  </div>
+</dialog>
+
+<dialog id="deleteDialog">
+  <div class="modal">
+    <div class="modal-head"><div><div class="tagline">PATVIRTINK</div><h2>Ištrinti įrašą?</h2></div></div>
+    <p class="tagline">Šio veiksmo atšaukti nepavyks.</p>
+    <div class="modal-actions">
+      <button id="cancelDeleteBtn" class="cancel" type="button">Ne</button>
+      <button id="confirmDeleteBtn" class="danger" type="button">Taip, ištrinti</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="app.js" defer></script>
+</body>
+</html>
